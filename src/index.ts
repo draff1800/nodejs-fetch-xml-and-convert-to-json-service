@@ -1,21 +1,23 @@
-import * as xml2js from 'xml2js';
-import * as fs from 'fs';
+import express from 'express';
+import fs from 'fs';
+import {
+  fetchAndParseMakes
+  // fetchAndParseVehicleTypes
+} from './services/xmlService';
 
-const xml = `<?xml version="1.0" encoding="UTF-8" ?>
-            <user id="1">
-                <name>John Doe</name>
-                <email>john.doe@example.com</email>
-                <roles>
-                    <role>Member</role>
-                    <role>Admin</role>
-                </roles>
-                <admin>true</admin>
-            </user>`;
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-xml2js
-  .parseStringPromise(xml, { mergeAttrs: true })
-  .then((result) => {
-    const json = JSON.stringify(result, null, 4);
-    fs.writeFileSync('user.json', json);
-  })
-  .catch((err) => console.log(err));
+app.listen(PORT, async () => {
+  console.log(`Server is running on port ${PORT}`);
+
+  try {
+    const makes = await fetchAndParseMakes();
+    fs.writeFileSync('makes.json', JSON.stringify(makes, null, 2));
+
+    // const types = await fetchAndParseVehicleTypes(makes[0].Make_ID);
+    // fs.writeFileSync('types.json', String(makes));
+  } catch (error) {
+    console.error('Error fetching and parsing data:', error);
+  }
+});
