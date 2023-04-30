@@ -11,6 +11,12 @@ interface Type {
   VehicleTypeName: string;
 }
 
+interface MakeWithTypes {
+  makeId: string;
+  makeName: string;
+  vehicleTypes: Type[];
+}
+
 interface FetchMakesResponseJSON {
   Response: {
     Results: {
@@ -29,7 +35,7 @@ interface FetchTypesResponseJSON {
 
 async function fetchXML(url: string): Promise<string> {
   try {
-    const response = await axios.get(url);
+    const response = await axios.get(url, { withCredentials: false });
     return response.data;
   } catch (error) {
     console.error(`Error fetching XML data: ${error}`);
@@ -53,7 +59,7 @@ export async function fetchMakesAsJSON(): Promise<Make[]> {
   const url = 'https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=XML';
   const xml = await fetchXML(url);
   const json = await convertXMLToJSON<FetchMakesResponseJSON>(xml);
-  return json.Response.Results.AllVehicleMakes;
+  return json.Response.Results.AllVehicleMakes.slice(0, 10);
 }
 
 export async function fetchTypesAsJSON(makeId: string): Promise<Type[]> {
@@ -61,4 +67,19 @@ export async function fetchTypesAsJSON(makeId: string): Promise<Type[]> {
   const xml = await fetchXML(url);
   const json = await convertXMLToJSON<FetchTypesResponseJSON>(xml);
   return json.Response.Results.VehicleTypesForMakeIds;
+}
+
+export async function getMakesWithTypes(): Promise<MakeWithTypes[]> {
+  const makes = await fetchMakesAsJSON();
+  const makesWithTypesPromises = makes.map(async (make) => {
+    const types = await fetchTypesAsJSON(make.Make_ID);
+    return {
+      makeId: make.Make_ID,
+      makeName: make.Make_Name,
+      vehicleTypes: types
+    };
+  });
+
+  const makesWithTypes = await Promise.all(makesWithTypesPromises);
+  return makesWithTypes;
 }
