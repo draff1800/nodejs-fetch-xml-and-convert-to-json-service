@@ -6,7 +6,12 @@ interface Make {
   Make_Name: string;
 }
 
-interface ResponseWrapper {
+interface Type {
+  VehicleTypeId: string;
+  VehicleTypeName: string;
+}
+
+interface FetchMakesResponseJSON {
   Response: {
     Results: {
       AllVehicleMakes: Make[];
@@ -14,10 +19,13 @@ interface ResponseWrapper {
   };
 }
 
-// interface Type {
-//   VehicleTypeId: string;
-//   VehicleTypeName: string;
-// }
+interface FetchTypesResponseJSON {
+  Response: {
+    Results: {
+      VehicleTypesForMakeIds: Type[];
+    };
+  };
+}
 
 async function fetchXML(url: string): Promise<string> {
   try {
@@ -29,35 +37,28 @@ async function fetchXML(url: string): Promise<string> {
   }
 }
 
-async function convertXMLToJSON<T>(xmlData: string): Promise<T> {
+async function convertXMLToJSON<T>(xml: string): Promise<T> {
   try {
-    const jsonData = await parseStringPromise(xmlData, {
+    const json = await parseStringPromise(xml, {
       explicitArray: false
     });
-    console.log(jsonData);
-    return jsonData;
+    return json;
   } catch (error) {
     console.error(`Error parsing XML data: ${error}`);
     throw error;
   }
 }
 
-export async function fetchAndParseMakes(): Promise<Make[]> {
-  const getAllMakesURL =
-    'https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=XML';
-  const xmlData = await fetchXML(getAllMakesURL);
-  const parsedData = await convertXMLToJSON<ResponseWrapper>(xmlData);
-  return parsedData.Response.Results.AllVehicleMakes;
+export async function fetchMakesAsJSON(): Promise<Make[]> {
+  const url = 'https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=XML';
+  const xml = await fetchXML(url);
+  const json = await convertXMLToJSON<FetchMakesResponseJSON>(xml);
+  return json.Response.Results.AllVehicleMakes;
 }
 
-// export async function fetchAndParseVehicleTypes(
-//   makeId: string
-// ): Promise<Type[]> {
-//   const vehicleTypesURL = `https://vpic.nhtsa.dot.gov/api/vehicles/GetVehicleTypesForMakeId/${makeId}?format=xml`;
-//   const xmlData = await fetchXML(vehicleTypesURL);
-//   const parsedData = await convertXMLToJSON<{
-//     Results: { VehicleType: Type[] };
-//   }>(xmlData);
-
-//   return parsedData.Results.VehicleType;
-// }
+export async function fetchTypesAsJSON(makeId: string): Promise<Type[]> {
+  const url = `https://vpic.nhtsa.dot.gov/api/vehicles/GetVehicleTypesForMakeId/${makeId}?format=xml`;
+  const xml = await fetchXML(url);
+  const json = await convertXMLToJSON<FetchTypesResponseJSON>(xml);
+  return json.Response.Results.VehicleTypesForMakeIds;
+}

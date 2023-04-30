@@ -1,9 +1,6 @@
 import express from 'express';
 import fs from 'fs';
-import {
-  fetchAndParseMakes
-  // fetchAndParseVehicleTypes
-} from './services/xmlService';
+import { fetchMakesAsJSON, fetchTypesAsJSON } from './services/xmlService';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,11 +9,11 @@ app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
   try {
-    const makes = await fetchAndParseMakes();
-    fs.writeFileSync('makes.json', JSON.stringify(makes, null, 2));
+    const makes = await fetchMakesAsJSON();
+    const types = await fetchTypesAsJSON(makes[0].Make_ID);
 
-    // const types = await fetchAndParseVehicleTypes(makes[0].Make_ID);
-    // fs.writeFileSync('types.json', String(makes));
+    fs.writeFileSync('makes.json', JSON.stringify(makes, null, 2));
+    fs.writeFileSync('types.json', JSON.stringify(types, null, 2));
   } catch (error) {
     console.error('Error fetching and parsing data:', error);
   }
