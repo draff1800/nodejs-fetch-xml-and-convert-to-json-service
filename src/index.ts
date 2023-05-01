@@ -1,19 +1,17 @@
 import express from 'express';
-import fs from 'fs';
 import { getMakesWithTypes } from './services/vehicleApiService';
+import { connectToDB, saveToDB } from './utils/database';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, async () => {
+  const dbClient = await connectToDB();
   console.log(`Server is running on port ${PORT}`);
 
   try {
     const makesWithTypes = await getMakesWithTypes();
-    fs.writeFileSync(
-      'makesWithTypes.json',
-      JSON.stringify(makesWithTypes, null, 2)
-    );
+    saveToDB(dbClient, 'makesWithTypes', makesWithTypes);
   } catch (error) {
     console.error('Error fetching and parsing data:', error);
   }
