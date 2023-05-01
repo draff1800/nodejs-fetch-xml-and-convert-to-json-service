@@ -23,7 +23,7 @@ export async function connectToDB(): Promise<MongoClient> {
   return client;
 }
 
-export async function saveToDB<T extends Document>(
+export async function saveMany<T extends Document>(
   client: MongoClient,
   collectionName: string,
   data: OptionalUnlessRequiredId<T>[]
@@ -31,4 +31,13 @@ export async function saveToDB<T extends Document>(
   const db = client.db(cluster);
   const collection: Collection<T> = db.collection(collectionName);
   await collection.insertMany(data);
+}
+
+export async function deleteAll(
+  client: MongoClient,
+  collectionName: string
+): Promise<void> {
+  const db = client.db(cluster);
+  const collection: Collection = db.collection(collectionName);
+  await collection.deleteMany({});
 }
