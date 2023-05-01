@@ -1,6 +1,6 @@
 import express from 'express';
 import fs from 'fs';
-import { getMakesWithTypes } from './services/xmlService';
+import { getMakesWithTypes } from './services/vehicleApiService';
 
 const app = express();
 const PORT = process.env.PORT || 3000;

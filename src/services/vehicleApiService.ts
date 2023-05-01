@@ -1,67 +1,14 @@
-import axios from 'axios';
-import { parseStringPromise } from 'xml2js';
-
-interface FetchedMake {
-  Make_ID: string;
-  Make_Name: string;
-}
-
-interface FetchedType {
-  VehicleTypeId: string;
-  VehicleTypeName: string;
-}
-
-interface FetchMakesResponse {
-  Response: {
-    Results: {
-      AllVehicleMakes: FetchedMake[];
-    };
-  };
-}
-
-interface FetchTypesResponse {
-  Response: {
-    Results: {
-      VehicleTypesForMakeIds: FetchedType[];
-    };
-  };
-}
-
-interface Make {
-  makeId: string;
-  makeName: string;
-}
-
-interface Type {
-  typeId: string;
-  typeName: string;
-}
-
-interface MakeWithTypes extends Make {
-  vehicleTypes: Type[];
-}
-
-async function fetchXML(url: string): Promise<string> {
-  try {
-    const response = await axios.get(url, { withCredentials: false });
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching XML data: ${error}`);
-    throw error;
-  }
-}
-
-async function convertXMLToJSON<T>(xml: string): Promise<T> {
-  try {
-    const json = await parseStringPromise(xml, {
-      explicitArray: false
-    });
-    return json;
-  } catch (error) {
-    console.error(`Error parsing XML data: ${error}`);
-    throw error;
-  }
-}
+import { getData } from '../utils/httpRequests';
+import { xmlToJSON } from '../utils/dataProcessing';
+import {
+  FetchedMake,
+  FetchedType,
+  FetchMakesResponse,
+  FetchTypesResponse,
+  Make,
+  Type,
+  MakeWithTypes
+} from '../models/vehicle.models';
 
 function mapFetchedMakeToMake(fetchedMake: FetchedMake): Make {
   return {
@@ -79,8 +26,8 @@ function mapFetchedTypeToType(fetchedType: FetchedType): Type {
 
 export async function fetchAndFormatMakes(): Promise<Make[]> {
   const url = 'https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=XML';
-  const xml = await fetchXML(url);
-  const json = await convertXMLToJSON<FetchMakesResponse>(xml);
+  const xml = await getData(url);
+  const json = await xmlToJSON<FetchMakesResponse>(xml);
   const fetchedMakes = json.Response.Results.AllVehicleMakes.slice(0, 10);
 
   return fetchedMakes.map((fetchedMake) => mapFetchedMakeToMake(fetchedMake));
@@ -88,8 +35,8 @@ export async function fetchAndFormatMakes(): Promise<Make[]> {
 
 export async function fetchAndFormatTypes(makeId: string): Promise<Type[]> {
   const url = `https://vpic.nhtsa.dot.gov/api/vehicles/GetVehicleTypesForMakeId/${makeId}?format=xml`;
-  const xml = await fetchXML(url);
-  const json = await convertXMLToJSON<FetchTypesResponse>(xml);
+  const xml = await getData(url);
+  const json = await xmlToJSON<FetchTypesResponse>(xml);
   const fetchedTypes = json.Response.Results.VehicleTypesForMakeIds;
   const fetchedTypesArray = Array.isArray(fetchedTypes)
     ? fetchedTypes
