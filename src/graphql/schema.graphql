@@ -1,0 +1,14 @@
+type Make {
+  makeId: Int!
+  makeName: String!
+  vehicleTypes: [Type!]!
+}
+
+type Type {
+  typeId: Int!
+  typeName: String!
+}
+
+type Query {
+  makes: [Make!]!
+}
