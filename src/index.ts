@@ -1,19 +1,19 @@
 import express from 'express';
-import { getMakesWithTypes } from './services/vehicleApiService';
-import { connectToDB, saveMany, deleteAll } from './utils/database';
+import vehicleRoutes from './routes/vehicleRoutes';
+import { connectToDB } from './utils/database';
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+connectToDB()
+  .then(() => {
+    const app = express();
+    const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, async () => {
-  const dbClient = await connectToDB();
-  console.log(`Server is running on port ${PORT}`);
+    app.use('/vehicles', vehicleRoutes);
 
-  try {
-    const makesWithTypes = await getMakesWithTypes();
-    await deleteAll(dbClient, 'makesWithTypes');
-    await saveMany(dbClient, 'makesWithTypes', makesWithTypes);
-  } catch (error) {
-    console.error('Error fetching and parsing data:', error);
-  }
-});
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((error: Error) => {
+    console.error('Database connection failed', error);
+    process.exit();
+  });
