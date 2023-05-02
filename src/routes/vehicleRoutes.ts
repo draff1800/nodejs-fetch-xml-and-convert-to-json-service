@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requestHandler } from '../utils/inboundRequests';
+import { requestHandler } from '../utils/requestHandling/inboundRequests';
 import { getAllMakesWithTypes } from '../controllers/vehicleController';
 
 const router = Router();

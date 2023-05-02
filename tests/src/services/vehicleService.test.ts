@@ -69,6 +69,11 @@ describe('refreshMakesWithTypesDB()', () => {
   });
 });
 
+/* NOTE: With regard to testing data transformation, the imported xmlToJSON function is not
+mocked and therefore runs like it would in production (The code in utils/dataProcessing.ts has
+an impact on whether the following tests pass or not, and so is tested). Ideally, it would
+have its own test file and be stubbed here, but I didn't want to go overboard!*/
+
 describe('getMakesWithTypes()', () => {
   it(`
     GIVEN DB is empty, 

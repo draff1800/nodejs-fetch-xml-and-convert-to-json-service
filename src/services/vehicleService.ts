@@ -1,4 +1,4 @@
-import { getData } from '../utils/outboundRequests';
+import { getData } from '../utils/requestHandling/outboundRequests';
 import { xmlToJSON } from '../utils/dataProcessing';
 import {
   FetchedMake,
@@ -29,6 +29,9 @@ async function fetchAndFormatMakes(): Promise<Make[]> {
   const path = '/getallmakes?format=XML';
   const xml = await getData(path);
   const json = await xmlToJSON<FetchMakesResponse>(xml);
+  /* NOTE: Limiting Makes from 10,000. .gov APIs don't like thousands of Types calls :P
+  There are possibly ways around this - Rate limiting libraries, caching etc. But I prioritised
+  other features for this challenge. */
   const fetchedMakes = json.Response.Results.AllVehicleMakes.slice(0, 10);
 
   return fetchedMakes.map((fetchedMake) => formatFetchedMake(fetchedMake));

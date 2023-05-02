@@ -30,7 +30,13 @@ export async function saveMany<T extends Document>(
 ): Promise<void> {
   const db = client.db(cluster);
   const collection: Collection<T> = db.collection(collectionName);
-  await collection.insertMany(data);
+
+  try {
+    await collection.insertMany(data);
+  } catch (error) {
+    console.error(`Error saving to ${collectionName}: ${error}`);
+    throw error;
+  }
 }
 
 export async function getAll<T extends Document>(
@@ -38,11 +44,23 @@ export async function getAll<T extends Document>(
 ): Promise<WithId<T>[]> {
   const db = client.db(cluster);
   const collection: Collection<T> = db.collection(collectionName);
-  return await collection.find().toArray();
+
+  try {
+    return await collection.find().toArray();
+  } catch (error) {
+    console.error(`Error retrieving objects from ${collectionName}: ${error}`);
+    throw error;
+  }
 }
 
 export async function deleteAll(collectionName: string): Promise<void> {
   const db = client.db(cluster);
   const collection: Collection = db.collection(collectionName);
-  await collection.deleteMany({});
+
+  try {
+    await collection.deleteMany({});
+  } catch (error) {
+    console.error(`Error deleting objects from ${collectionName}: ${error}`);
+    throw error;
+  }
 }

@@ -1,4 +1,4 @@
-import axios from '../utils/axiosConfig';
+import axios from '../axiosConfig';
 
 export async function getData(path: string): Promise<string> {
   try {
