@@ -12,6 +12,7 @@
     "strict": true,                                     
     "noImplicitAny": true,                              
     "skipLibCheck": true,
-    "sourceMap": true                               
-  }
+    "sourceMap": true                          
+  },
+  "exclude": ["tests", "jest.config.js"]
 }
