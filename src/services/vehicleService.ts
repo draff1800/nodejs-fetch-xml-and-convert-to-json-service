@@ -25,18 +25,18 @@ function formatFetchedType(fetchedType: FetchedType): Type {
   };
 }
 
-export async function fetchAndFormatMakes(): Promise<Make[]> {
-  const url = 'https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=XML';
-  const xml = await getData(url);
+async function fetchAndFormatMakes(): Promise<Make[]> {
+  const path = '/getallmakes?format=XML';
+  const xml = await getData(path);
   const json = await xmlToJSON<FetchMakesResponse>(xml);
   const fetchedMakes = json.Response.Results.AllVehicleMakes.slice(0, 10);
 
   return fetchedMakes.map((fetchedMake) => formatFetchedMake(fetchedMake));
 }
 
-export async function fetchAndFormatTypes(makeId: string): Promise<Type[]> {
-  const url = `https://vpic.nhtsa.dot.gov/api/vehicles/GetVehicleTypesForMakeId/${makeId}?format=xml`;
-  const xml = await getData(url);
+async function fetchAndFormatTypes(makeId: string): Promise<Type[]> {
+  const path = `/GetVehicleTypesForMakeId/${makeId}?format=xml`;
+  const xml = await getData(path);
   const json = await xmlToJSON<FetchTypesResponse>(xml);
   const fetchedTypes = json.Response.Results.VehicleTypesForMakeIds;
   const fetchedTypesArray = Array.isArray(fetchedTypes)
