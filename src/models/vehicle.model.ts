@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb';
+
 export interface FetchedMake {
   Make_ID: string;
   Make_Name: string;
@@ -36,4 +38,8 @@ export interface Type {
 
 export interface MakeWithTypes extends Make {
   vehicleTypes: Type[];
+}
+
+export interface DBMakeWithTypes extends MakeWithTypes {
+  _id: ObjectId;
 }

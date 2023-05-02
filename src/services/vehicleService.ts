@@ -9,7 +9,7 @@ import {
   Type,
   MakeWithTypes
 } from '../models/vehicle.model';
-import { deleteAll, saveMany } from '../utils/database';
+import { getAll, saveMany } from '../utils/database';
 
 function formatFetchedMake(fetchedMake: FetchedMake): Make {
   return {
@@ -46,7 +46,7 @@ async function fetchAndFormatTypes(makeId: string): Promise<Type[]> {
   return fetchedTypesArray.map((fetchedType) => formatFetchedType(fetchedType));
 }
 
-export async function saveAndGetMakesWithTypes(): Promise<MakeWithTypes[]> {
+export async function fetchAndFormatMakesWithTypes(): Promise<MakeWithTypes[]> {
   const makes = await fetchAndFormatMakes();
   const makesWithTypesPromises = makes.map(async (make) => {
     const types = await fetchAndFormatTypes(make.makeId);
@@ -58,7 +58,21 @@ export async function saveAndGetMakesWithTypes(): Promise<MakeWithTypes[]> {
   });
   const makesWithTypes = await Promise.all(makesWithTypesPromises);
 
-  await deleteAll('makesWithTypes');
-  await saveMany('makesWithTypes', makesWithTypes);
+  return makesWithTypes;
+}
+
+export async function getMakesWithTypes(): Promise<MakeWithTypes[]> {
+  const dbResults = await getAll('makesWithTypes');
+  let makesWithTypes: MakeWithTypes[] = [];
+
+  if (dbResults.length === 0) {
+    makesWithTypes = await fetchAndFormatMakesWithTypes();
+    await saveMany('makesWithTypes', makesWithTypes);
+  } else {
+    makesWithTypes = dbResults.map(
+      ({ _id, ...rest }) => rest
+    ) as MakeWithTypes[];
+  }
+
   return makesWithTypes;
 }

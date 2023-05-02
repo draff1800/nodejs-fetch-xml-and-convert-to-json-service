@@ -3,7 +3,8 @@ import {
   MongoClient,
   Collection,
   Document,
-  OptionalUnlessRequiredId
+  OptionalUnlessRequiredId,
+  WithId
 } from 'mongodb';
 
 dotenv.config();
@@ -30,6 +31,14 @@ export async function saveMany<T extends Document>(
   const db = client.db(cluster);
   const collection: Collection<T> = db.collection(collectionName);
   await collection.insertMany(data);
+}
+
+export async function getAll<T extends Document>(
+  collectionName: string
+): Promise<WithId<T>[]> {
+  const db = client.db(cluster);
+  const collection: Collection<T> = db.collection(collectionName);
+  return await collection.find().toArray();
 }
 
 export async function deleteAll(collectionName: string): Promise<void> {
