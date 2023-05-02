@@ -8,7 +8,7 @@ import {
   Make,
   Type,
   MakeWithTypes
-} from '../models/vehicle.models';
+} from '../models/vehicle.model';
 import { deleteAll, saveMany } from '../utils/database';
 
 function formatFetchedMake(fetchedMake: FetchedMake): Make {
