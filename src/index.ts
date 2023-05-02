@@ -5,7 +5,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { readFileSync } from 'fs';
 import vehicleRoutes from './routes/vehicleRoutes';
 import { connectToDB } from './utils/database';
-import { getMakesWithTypes } from './services/vehicleService';
+import { refreshMakesWithTypesDB } from './services/vehicleService';
 import { resolvers } from './graphql/resolvers';
 
 connectToDB()
@@ -24,7 +24,7 @@ connectToDB()
       })
     );
 
-    schedule.scheduleJob('0 0 * * *', getMakesWithTypes);
+    schedule.scheduleJob('0 0 * * *', refreshMakesWithTypesDB);
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

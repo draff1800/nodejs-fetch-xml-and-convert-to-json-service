@@ -9,7 +9,7 @@ import {
   Type,
   MakeWithTypes
 } from '../models/vehicle.model';
-import { getAll, saveMany } from '../utils/database';
+import { deleteAll, saveMany, getAll } from '../utils/database';
 
 function formatFetchedMake(fetchedMake: FetchedMake): Make {
   return {
@@ -59,6 +59,13 @@ export async function fetchAndFormatMakesWithTypes(): Promise<MakeWithTypes[]> {
   const makesWithTypes = await Promise.all(makesWithTypesPromises);
 
   return makesWithTypes;
+}
+
+export async function refreshMakesWithTypesDB(): Promise<void> {
+  const makesWithTypes = await fetchAndFormatMakesWithTypes();
+
+  await deleteAll('makesWithTypes');
+  await saveMany('makesWithTypes', makesWithTypes);
 }
 
 export async function getMakesWithTypes(): Promise<MakeWithTypes[]> {

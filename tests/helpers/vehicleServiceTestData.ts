@@ -1,5 +1,5 @@
-import { ObjectId, WithId } from 'mongodb';
-import { DBMakeWithTypes, MakeWithTypes } from '../../src/models/vehicle.model';
+import { ObjectId } from 'mongodb';
+import { DBMakeWithTypes } from '../../src/models/vehicle.model';
 
 export const getAllMakesResponseStub =
   '<Response xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><Count>5</Count><Message>Response returned successfully</Message><Results><AllVehicleMakes><Make_ID>11897</Make_ID><Make_Name> MID-TOWN TRAILERS</Make_Name></AllVehicleMakes><AllVehicleMakes><Make_ID>4877</Make_ID><Make_Name>1/OFF KUSTOMS, LLC</Make_Name></AllVehicleMakes><AllVehicleMakes><Make_ID>11257</Make_ID><Make_Name>102 IRONWORKS, INC.</Make_Name></AllVehicleMakes><AllVehicleMakes><Make_ID>12255</Make_ID><Make_Name>12832429 CANADA INC.</Make_Name></AllVehicleMakes><AllVehicleMakes><Make_ID>6387</Make_ID><Make_Name>17 CREEK ENTERPRISES</Make_Name></AllVehicleMakes></Results></Response>';
@@ -84,7 +84,7 @@ export const populatedDBQueryStub: DBMakeWithTypes[] = [
   }
 ];
 
-export const getMakesWithTypesExpectedOutput = [
+export const fetchAndFormatMakesWithTypesOutput = [
   {
     makeId: '11897',
     makeName: ' MID-TOWN TRAILERS',

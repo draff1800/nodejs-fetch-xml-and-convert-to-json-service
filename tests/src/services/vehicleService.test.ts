@@ -1,51 +1,79 @@
 import { getData } from '../../../src/utils/outboundRequests';
-import { getAll, saveMany } from '../../../src/utils/database';
+import { deleteAll, getAll, saveMany } from '../../../src/utils/database';
 import { getMakesWithTypes } from '../../../src/services/vehicleService';
 import {
   getAllMakesResponseStub,
   getVehicleTypesResponseStubs,
   emptyDBQueryStub,
   populatedDBQueryStub,
-  getMakesWithTypesExpectedOutput
+  fetchAndFormatMakesWithTypesOutput
 } from '../../helpers/vehicleServiceTestData';
+import { refreshMakesWithTypesDB } from '../../../src/services/vehicleService';
 
 jest.mock('../../../src/utils/outboundRequests');
 jest.mock('../../../src/utils/database');
 
 const mockGetData = getData as jest.MockedFunction<typeof getData>;
+const mockDeleteAll = deleteAll as jest.MockedFunction<typeof deleteAll>;
 const mockGetAll = getAll as jest.MockedFunction<typeof getAll>;
 const mockSaveMany = saveMany as jest.MockedFunction<typeof saveMany>;
 
 afterEach(() => {
   mockGetData.mockReset();
+  mockDeleteAll.mockReset();
   mockGetAll.mockReset();
   mockSaveMany.mockReset();
 });
 
-describe('getMakesWithTypes()', () => {
+describe('refreshMakesWithTypesDB()', () => {
   it(`
-    GIVEN DB contains makeWithTypes objects, 
-    WHEN getMakesWithTypes is called,
-    THEN no API calls or DB inserts should be made, and the formatted objects are returned`, async () => {
+    GIVEN Vehicle XML APIs are available, 
+    WHEN refreshMakesWithTypesDB() is called,
+    THEN the expected API calls and DB Delete/Insert operations are made`, async () => {
     // ARRANGE
-    mockGetAll.mockImplementationOnce(() =>
-      Promise.resolve(populatedDBQueryStub)
+    mockGetData.mockImplementationOnce(() =>
+      Promise.resolve(getAllMakesResponseStub)
+    );
+    mockGetData.mockImplementationOnce(() =>
+      Promise.resolve(getVehicleTypesResponseStubs[0])
+    );
+    mockGetData.mockImplementationOnce(() =>
+      Promise.resolve(getVehicleTypesResponseStubs[1])
+    );
+    mockGetData.mockImplementationOnce(() =>
+      Promise.resolve(getVehicleTypesResponseStubs[2])
+    );
+    mockGetData.mockImplementationOnce(() =>
+      Promise.resolve(getVehicleTypesResponseStubs[3])
+    );
+    mockGetData.mockImplementationOnce(() =>
+      Promise.resolve(getVehicleTypesResponseStubs[4])
     );
 
     // ACT
-    const result = await getMakesWithTypes();
+    await refreshMakesWithTypesDB();
 
     // ASSERT
-    expect(mockGetAll.mock.calls).toEqual([['makesWithTypes']]);
-    expect(mockGetData).not.toHaveBeenCalled();
-    expect(mockSaveMany).not.toHaveBeenCalled();
-    expect(result).toEqual(getMakesWithTypesExpectedOutput);
+    expect(mockGetData.mock.calls).toEqual([
+      ['/getallmakes?format=XML'],
+      ['/GetVehicleTypesForMakeId/11897?format=xml'],
+      ['/GetVehicleTypesForMakeId/4877?format=xml'],
+      ['/GetVehicleTypesForMakeId/11257?format=xml'],
+      ['/GetVehicleTypesForMakeId/12255?format=xml'],
+      ['/GetVehicleTypesForMakeId/6387?format=xml']
+    ]);
+    expect(mockDeleteAll.mock.calls).toEqual([['makesWithTypes']]);
+    expect(mockSaveMany.mock.calls).toEqual([
+      ['makesWithTypes', fetchAndFormatMakesWithTypesOutput]
+    ]);
   });
+});
 
+describe('getMakesWithTypes()', () => {
   it(`
     GIVEN DB is empty, 
-    WHEN getMakesWithTypes is called,
-    THEN the expected API calls and DB inserts are made, and correct data is returned`, async () => {
+    WHEN getMakesWithTypes() is called,
+    THEN the expected API calls and DB Inserts are made, and correct data is returned`, async () => {
     // ARRANGE
     mockGetAll.mockImplementationOnce(() => Promise.resolve(emptyDBQueryStub));
     mockGetData.mockImplementationOnce(() =>
@@ -81,9 +109,28 @@ describe('getMakesWithTypes()', () => {
       ['/GetVehicleTypesForMakeId/6387?format=xml']
     ]);
     expect(mockSaveMany.mock.calls).toEqual([
-      ['makesWithTypes', getMakesWithTypesExpectedOutput]
+      ['makesWithTypes', fetchAndFormatMakesWithTypesOutput]
     ]);
 
-    expect(result).toEqual(getMakesWithTypesExpectedOutput);
+    expect(result).toEqual(fetchAndFormatMakesWithTypesOutput);
+  });
+
+  it(`
+    GIVEN DB contains makeWithTypes objects, 
+    WHEN getMakesWithTypes() is called,
+    THEN no API calls or DB Inserts are made, and the formatted objects are returned`, async () => {
+    // ARRANGE
+    mockGetAll.mockImplementationOnce(() =>
+      Promise.resolve(populatedDBQueryStub)
+    );
+
+    // ACT
+    const result = await getMakesWithTypes();
+
+    // ASSERT
+    expect(mockGetAll.mock.calls).toEqual([['makesWithTypes']]);
+    expect(mockGetData).not.toHaveBeenCalled();
+    expect(mockSaveMany).not.toHaveBeenCalled();
+    expect(result).toEqual(fetchAndFormatMakesWithTypesOutput);
   });
 });
