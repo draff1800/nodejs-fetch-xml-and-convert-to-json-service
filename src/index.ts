@@ -18,12 +18,13 @@ connectToDB()
     app.use('/vehicles', vehicleRoutes);
 
     app.use(
-      '/gql/vehicles/makes',
+      '/gql/vehicles',
       createHandler({
         schema
       })
     );
 
+    // Refresh the database every night at midnight
     schedule.scheduleJob('0 0 * * *', refreshMakesWithTypesDB);
 
     app.listen(PORT, () => {

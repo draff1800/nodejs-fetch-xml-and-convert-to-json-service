@@ -75,13 +75,13 @@ export async function getMakesWithTypes(): Promise<MakeWithTypes[]> {
   const dbResults = await getAll('makesWithTypes');
   let makesWithTypes: MakeWithTypes[] = [];
 
-  if (dbResults.length === 0) {
-    makesWithTypes = await fetchAndFormatMakesWithTypes();
-    await saveMany('makesWithTypes', makesWithTypes);
-  } else {
+  if (dbResults.length > 0) {
     makesWithTypes = dbResults.map(
       ({ _id, ...rest }) => rest
     ) as MakeWithTypes[];
+  } else {
+    makesWithTypes = await fetchAndFormatMakesWithTypes();
+    await saveMany('makesWithTypes', makesWithTypes);
   }
 
   return makesWithTypes;

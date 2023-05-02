@@ -1,4 +1,4 @@
-import { getData } from '../../../src/utils/outboundRequests';
+import { getData } from '../../../src/utils/requestHandling/outboundRequests';
 import { deleteAll, getAll, saveMany } from '../../../src/utils/database';
 import { getMakesWithTypes } from '../../../src/services/vehicleService';
 import {
@@ -10,7 +10,7 @@ import {
 } from '../../helpers/vehicleServiceTestData';
 import { refreshMakesWithTypesDB } from '../../../src/services/vehicleService';
 
-jest.mock('../../../src/utils/outboundRequests');
+jest.mock('../../../src/utils/requestHandling/outboundRequests');
 jest.mock('../../../src/utils/database');
 
 const mockGetData = getData as jest.MockedFunction<typeof getData>;
