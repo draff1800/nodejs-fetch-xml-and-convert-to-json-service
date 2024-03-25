@@ -1,6 +1,6 @@
 # Node.js Fetch XML And Convert to JSON Service
 
-A Node.js service which gets XML data from the [Canadian Department of Transportation](https://vpic.nhtsa.dot.gov/api), converts it to JSON, and saves it to a MongoDB database. It also updates this database every night. GET / GQL endpoints are exposed for users to retrieve this data.
+A Node.js service which gets XML data from the [Canadian Department of Transportation](https://vpic.nhtsa.dot.gov/api), converts it to JSON, and saves it to a MongoDB database. It also updates this database every night. GET / GQL endpoints are exposed to retrieve this data.
 
 ## Guide
 * Deploy a database cluster on [MongoDB](https://www.mongodb.com/).
