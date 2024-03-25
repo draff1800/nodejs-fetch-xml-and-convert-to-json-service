@@ -11,10 +11,10 @@ A Node.js service which gets XML data from the [Canadian Department of Transport
 
 <br />
 
-* Run `npm start` to run the service. This also schedules a database refresh each midnight, using data from [vPIC](https://vpic.nhtsa.dot.gov/api).
+* Run `npm start` to run the service. The database will be refreshed every night at 00:00, using data from [vPIC](https://vpic.nhtsa.dot.gov/api).
 * In a new terminal, run `curl http://localhost:3000/vehicles/makes` to fetch Vehicle Makes and Types.
   * The service will initially check the database.
-  * If database is empty, it will be populated using [vPIC's API](https://vpic.nhtsa.dot.gov/api) before returning the newly stored data.
+  * If database is empty, it is populated using [vPIC's API](https://vpic.nhtsa.dot.gov/api) before returning the newly stored data.
 * You can also access this data using GraphQL:
   * Run: `curl -X POST -H "Content-Type: application/json" --data '{ "query": "{ makes { makeId makeName vehicleTypes { typeId typeName } } }" }' http://localhost:3000/gql/vehicles`, or use a GraphQL client tool.
   * Like above, the database will be populated if it is empty.
